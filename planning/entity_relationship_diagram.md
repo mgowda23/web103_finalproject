@@ -1,17 +1,95 @@
 # Entity Relationship Diagram
 
-Reference the Creating an Entity Relationship Diagram final project guide in the course portal for more information about how to complete this deliverable.
+## List of Tables
 
-## Create the List of Tables
+- `users`: Demo users and future GitHub OAuth identities.
+- `tasks`: One-time or scheduled work items owned by a user.
+- `habits`: Recurring routines owned by a user.
+- `habit_completions`: Daily completion records for habits.
+- `categories`: Reusable labels such as Health, Career, Learning, Personal,
+  and Finance.
+- `task_categories`: Join table connecting tasks and categories.
 
-[👉🏾👉🏾👉🏾 List each table in your diagram]
+## Entity Relationship Diagram
 
-## Add the Entity Relationship Diagram
+![HabitFlow entity relationship diagram](../images/HabitFlow_ERD.png)
 
-[👉🏾👉🏾👉🏾 Include an image or images of the diagram below. You may also wish to use the following markdown syntax to outline each table, as per your preference.]
+```mermaid
+erDiagram
+    USERS ||--o{ TASKS : owns
+    USERS ||--o{ HABITS : owns
+    HABITS ||--o{ HABIT_COMPLETIONS : records
+    TASKS ||--o{ TASK_CATEGORIES : has
+    CATEGORIES ||--o{ TASK_CATEGORIES : labels
 
-| Column Name | Type | Description |
-|-------------|------|-------------|
-| id | integer | primary key |
-| name | text | name of the shoe model |
-| ... | ... | ... |
+    USERS {
+        integer id PK
+        text name
+        text email UK
+        text github_id UK
+        timestamp created_at
+    }
+
+    TASKS {
+        integer id PK
+        integer user_id FK
+        text title
+        text description
+        text priority
+        date due_date
+        boolean completed
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    HABITS {
+        integer id PK
+        integer user_id FK
+        text name
+        text description
+        text frequency
+        integer current_streak
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    HABIT_COMPLETIONS {
+        integer id PK
+        integer habit_id FK
+        date completed_on
+        timestamp created_at
+    }
+
+    CATEGORIES {
+        integer id PK
+        text name UK
+        text color
+    }
+
+    TASK_CATEGORIES {
+        integer task_id PK, FK
+        integer category_id PK, FK
+    }
+```
+
+## Relationship Notes
+
+- `users` to `tasks` is a one-to-many relationship.
+- `users` to `habits` is a one-to-many relationship.
+- `habits` to `habit_completions` is a one-to-many relationship.
+- `tasks` to `categories` is a many-to-many relationship implemented with
+  `task_categories`.
+- The composite primary key on `task_categories` prevents assigning the same
+  category to the same task more than once.
+- The `github_id` field is reserved for the planned GitHub OAuth stretch
+  feature. The core app can use seeded demo data before authentication is added.
+
+## Seeded Categories
+
+The initial database state will include:
+
+- Health
+- Career
+- Learning
+- Personal
+- Finance
